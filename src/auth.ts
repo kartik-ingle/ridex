@@ -1,39 +1,40 @@
 import connectDb from "@/lib/db"
 import User from "@/models/user.model"
-import NextAuth from "next-auth"
+import type { NextAuthOptions, Session } from "next-auth"
+import type { JWT } from "next-auth/jwt"
 import Credentials from "next-auth/providers/credentials"
 import Google from "next-auth/providers/google"
- 
-export const { handlers, signIn, signOut, auth } = NextAuth({
+
+export const authOptions: NextAuthOptions = {
     providers: [
         Credentials({
             credentials: {
                 email: {
-                type: "email",
-                label: "Email",
-                placeholder: "johndoe@gmail.com",
+                    type: "email",
+                    label: "Email",
+                    placeholder: "johndoe@gmail.com",
                 },
                 password: {
-                type: "password",
-                label: "Password",
-                placeholder: "*****",
+                    type: "password",
+                    label: "Password",
+                    placeholder: "*****",
                 },
             },
 
             async authorize(credentials) {
-                if(!credentials.email || !credentials.password) {
+                if (!credentials?.email || !credentials?.password) {
                     return null
                 }
 
                 await connectDb()
 
-                const user = await User.findOne({email: credentials.email})
-                if(!user) {
+                const user = await User.findOne({ email: credentials.email })
+                if (!user) {
                     return null
                 }
 
                 const isPasswordValid = await user.comparePassword(credentials.password)
-                if(!isPasswordValid) {
+                if (!isPasswordValid) {
                     return null
                 }
 
@@ -41,25 +42,25 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
                     id: user._id,
                     name: user.name,
                     email: user.email,
-                    role: user.role
+                    role: user.role,
                 }
             },
-        }), 
+        }),
 
         Google({
-            clientId: process.env.GOOGLE_CLIENT_ID!, 
-            clientSecret: process.env.GOOGLE_CLIENT_SECRET!
-        })
+            clientId: process.env.GOOGLE_CLIENT_ID!,
+            clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+        }),
     ],
 
     callbacks: {
-        async signIn({user, account}) {
-            if(account?.provider === "google") {
+        async signIn({ user, account }) {
+            if (account?.provider === "google") {
                 await connectDb()
 
-                let dbUser = await User.findOne({email: user.email})
+                let dbUser = await User.findOne({ email: user.email })
 
-                if(!dbUser) {
+                if (!dbUser) {
                     dbUser = await User.create({
                         name: user.name,
                         email: user.email,
@@ -73,8 +74,8 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
             return true
         },
 
-        async jwt({token, user}) {
-            if(user) {
+        async jwt({ token, user }) {
+            if (user) {
                 token.id = user.id
                 token.name = user.name
                 token.email = user.email
@@ -84,28 +85,27 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
             return token
         },
 
-        async session({token, session}) {
-
-            if(session.user) {
-                session.user.id = token.id as string,
-                session.user.name = token.name,
-                session.user.email = token.email as string,
+        async session({ token, session }: { token: JWT; session: Session }) {
+            if (session.user) {
+                session.user.id = token.id as string
+                session.user.name = token.name
+                session.user.email = token.email as string
                 session.user.role = token.role as string
             }
 
             return session
-        }
-    }, 
+        },
+    },
 
     pages: {
         signIn: "/signin",
-        error: "/signin"
-    }, 
+        error: "/signin",
+    },
 
     session: {
         strategy: "jwt",
-        maxAge: 10 * 24 * 60 * 60
-    }, 
+        maxAge: 10 * 24 * 60 * 60,
+    },
 
-    secret: process.env.NEXTAUTH_SECRET
-})
+    secret: process.env.NEXTAUTH_SECRET,
+}
