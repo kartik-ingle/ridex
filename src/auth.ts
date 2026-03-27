@@ -1,11 +1,17 @@
 import connectDb from "@/lib/db"
 import User from "@/models/user.model"
-import type { NextAuthOptions, Session } from "next-auth"
+import bcrypt from "bcryptjs"
+import type { Session } from "next-auth"
+import NextAuth from "next-auth"
 import type { JWT } from "next-auth/jwt"
 import Credentials from "next-auth/providers/credentials"
 import Google from "next-auth/providers/google"
 
-export const authOptions: NextAuthOptions = {
+const secret = process.env.NEXTAUTH_SECRET!
+
+
+
+export const { handlers, signIn, signOut, auth } = NextAuth({
     providers: [
         Credentials({
             credentials: {
@@ -22,18 +28,20 @@ export const authOptions: NextAuthOptions = {
             },
 
             async authorize(credentials) {
-                if (!credentials?.email || !credentials?.password) {
+                const { email, password } = credentials as { email?: string; password?: string }
+
+                if (!email || !password) {
                     return null
                 }
 
                 await connectDb()
 
-                const user = await User.findOne({ email: credentials.email })
+                const user = await User.findOne({ email })
                 if (!user) {
                     return null
                 }
 
-                const isPasswordValid = await user.comparePassword(credentials.password)
+                const isPasswordValid = await bcrypt.compare(password, user.password)
                 if (!isPasswordValid) {
                     return null
                 }
@@ -107,5 +115,5 @@ export const authOptions: NextAuthOptions = {
         maxAge: 10 * 24 * 60 * 60,
     },
 
-    secret: process.env.NEXTAUTH_SECRET,
-}
+    secret,
+})

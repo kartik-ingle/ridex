@@ -1,6 +1,6 @@
 import { IUser } from '@/models/user.model'
 import { createSlice } from '@reduxjs/toolkit'
-import type { PayloadAction } from '@reduxjs/toolkit'
+
 
 // Define a type for the slice state
 interface IUserState {
@@ -17,13 +17,15 @@ export const userSlice = createSlice({
   // `createSlice` will infer the state type from the `initialState` argument
   initialState,
   reducers: {
-    
+    setUserData:(state, action) => {
+      state.userData = action.payload
+    }
   },
 })
 
-export const { increment, decrement, incrementByAmount } = counterSlice.actions
+export const { setUserData} = userSlice.actions
 
 // Other code such as selectors can use the imported `RootState` type
-export const selectCount = (state: RootState) => state.counter.value
 
-export default counterSlice.reducer
+
+export default userSlice.reducer

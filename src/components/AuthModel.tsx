@@ -2,7 +2,7 @@
 import axios from "axios";
 import { CircleDashed, Lock, Mail, User, X } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
-import { signIn } from "next-auth/react";
+import { signIn, useSession } from "next-auth/react";
 import Image from "next/image";
 import { useState } from "react";
 
@@ -23,6 +23,9 @@ function AuthModel({ open, onClose }: propType) {
   const [err, setErr] = useState("")
 
   const [otp, setOtp] = useState(["", "", "", "", "", ""])
+
+  const session = useSession()
+  console.log(session)
 
   const handleSignUp = async () => {
     setLoading(true)
