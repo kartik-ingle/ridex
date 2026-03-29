@@ -17,7 +17,7 @@ export async function proxy(req: NextRequest) {
         return NextResponse.next()
     }
 
-    if(PUBLIC_APIS.includes(pathname)) {
+    if(PUBLIC_APIS.some((route) => pathname.startsWith(route))) {
         return NextResponse.next()
     }
 

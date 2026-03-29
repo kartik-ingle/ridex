@@ -3,14 +3,13 @@ import React, { useState } from "react";
 import { AnimatePresence, motion } from "motion/react";
 import Image from "next/image";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import AuthModel from "./AuthModel";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "@/redux/store";
 import { Bike, Car, ChevronRight, LogOut, Menu, Truck, X } from "lucide-react";
 import { signOut } from "next-auth/react";
 import { setUserData } from "@/redux/userSlice";
-import { div } from "motion/react-client";
 
 const navItems = ["Home", "Bookings", "About Us", "Contact"];
 
@@ -24,6 +23,8 @@ function Nav() {
 
   const {userData} = useSelector((state: RootState) => state.user)
   const dispatch = useDispatch<AppDispatch>()
+
+  const router = useRouter()
 
   const handleLogOut = async () => {
     await signOut({redirect: false})
@@ -86,7 +87,7 @@ function Nav() {
                         <p className="text-xs uppercase text-gray-500 mb-4">{userData.role}</p>
 
                         {userData.role !== "partner" && (
-                          <div className="w-full flex items-center gap-3 py-3 hover:bg-gray-100 rounded-xl pl-2 cursor-pointer">
+                          <div className="w-full flex items-center gap-3 py-3 hover:bg-gray-100 rounded-xl pl-2 cursor-pointer" onClick = {() => router.push("/partner/onboarding/vehicle")}>
                             <div className="flex -space-x-2">
                               <div className="w-6 h-6 rounded-full bg-black text-white flex items-center justify-center">
                                 <Bike size={14} />
@@ -205,7 +206,7 @@ function Nav() {
                         <p className="text-xs uppercase text-gray-500 mb-4">{userData.role}</p>
 
                         {userData.role !== "partner" && (
-                          <div className="w-full flex items-center gap-3 py-3 hover:bg-gray-100 rounded-xl pl-2 cursor-pointer">
+                          <div className="w-full flex items-center gap-3 py-3 hover:bg-gray-100 rounded-xl pl-2 cursor-pointer" onClick = {() => router.push("/partner/onboarding/vehicle")}>
                             <div className="flex -space-x-2">
                               <div className="w-6 h-6 rounded-full bg-black text-white flex items-center justify-center">
                                 <Bike size={14} />
