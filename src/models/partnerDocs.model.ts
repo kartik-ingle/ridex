@@ -1,6 +1,5 @@
 import mongoose from "mongoose";
 
-type vehicleType =  "bike" | "car" | "loading" | "truck" | "auto"
 
 
 interface IPartnerDocs{
