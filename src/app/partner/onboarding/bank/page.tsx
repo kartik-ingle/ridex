@@ -1,11 +1,38 @@
 'use client'
-import React from 'react'
+import React, { useState } from 'react'
 import {motion} from "motion/react"
-import { ArrowLeft, BadgeCheck, CheckCircle, CreditCard, Landmark, Phone } from 'lucide-react'
+import { ArrowLeft, BadgeCheck, CheckCircle, CircleDashed, CreditCard, Landmark, Phone } from 'lucide-react'
 import { useRouter } from 'next/navigation'
+import axios from 'axios'
 
 function page() {
     const router = useRouter()
+
+    const [accountHolder, setAccountHolder] = useState("")
+    const [accountNumber, setAccountNumber] = useState("")
+    const [ifsc, setIfsc] = useState("")
+    const [upi, setUpi] = useState("")
+    const [mobileNumber, setMobileNumber] = useState("")
+
+    const [loading, setLoading] = useState(false)
+    const [error, setError] = useState("")
+
+    const handleBank = async () => {
+        setLoading(true)
+        setError("")
+
+        try {
+            const {data} = await axios.post("/api/partner/onboarding/bank", {
+                accountHolder, accountNumber, ifsc, upi, mobileNumber
+            }) 
+            console.log(data)
+            setLoading(false)
+        } catch (error: any) {
+            setError(error?.response?.data?.message || "Something went wrong")
+            console.log(error)
+            setLoading(false)
+        }
+    }
 
     return (
         <div className='min-h-screen bg-white flex items-center justify-center px-4'>
@@ -43,7 +70,7 @@ function page() {
                         <div className='text-gray-400'>
                             <BadgeCheck />
                         </div>
-                        <input type="text" id='ahn' placeholder='As per bank records' className='flex-1 border-b pb-2 text-sm focus:outline-none border-gray-300 focus:border-black'/>
+                        <input type="text" id='ahn' placeholder='As per bank records' value={accountHolder} onChange={(e) => setAccountHolder(e.target.value)} className='flex-1 border-b pb-2 text-sm focus:outline-none border-gray-300 focus:border-black'/>
                     </div>
                 </div>
 
@@ -53,7 +80,7 @@ function page() {
                         <div className='text-gray-400'>
                             <CreditCard />
                         </div>
-                        <input type="text" id='ban' placeholder='Enter account number' className='flex-1 border-b pb-2 text-sm focus:outline-none border-gray-300 focus:border-black'/>
+                        <input type="text" id='ban' placeholder='Enter account number' value={accountNumber} onChange={(e) => setAccountNumber(e.target.value)} className='flex-1 border-b pb-2 text-sm focus:outline-none border-gray-300 focus:border-black'/>
                     </div>
                 </div>
 
@@ -63,7 +90,7 @@ function page() {
                         <div className='text-gray-400'>
                             <Landmark />
                         </div>
-                        <input type="text" id='ifsc' placeholder='HDFC0001234' className='flex-1 border-b pb-2 text-sm focus:outline-none border-gray-300 focus:border-black'/>
+                        <input type="text" id='ifsc' placeholder='HDFC0001234' value={ifsc} onChange={(e) => setIfsc(e.target.value)} className='flex-1 border-b pb-2 text-sm focus:outline-none border-gray-300 focus:border-black'/>
                     </div>
                 </div>
 
@@ -73,17 +100,19 @@ function page() {
                         <div className='text-gray-400'>
                             <Phone />
                         </div>
-                        <input type="tel" id='mob' placeholder='10 digit mobile number' className='flex-1 border-b pb-2 text-sm focus:outline-none border-gray-300 focus:border-black'/>
+                        <input type="tel" id='mob' placeholder='10 digit mobile number' value={mobileNumber} onChange={(e) => setMobileNumber(e.target.value)} className='flex-1 border-b pb-2 text-sm focus:outline-none border-gray-300 focus:border-black'/>
                     </div>
                 </div>
 
                 <div>
                     <label htmlFor="upi" className='text-xs font-semibold text-gray-500'>UPI ID (optional)</label>
                     <div className='flex items-center gap-2 mt-2'>
-                        <input type="text" id='upi' placeholder='name@upi' className='flex-1 border-b pb-2 text-sm focus:outline-none border-gray-300 focus:border-black'/>
+                        <input type="text" id='upi' placeholder='name@upi' value={upi} onChange={(e) => setUpi(e.target.value)} className='flex-1 border-b pb-2 text-sm focus:outline-none border-gray-300 focus:border-black'/>
                     </div>
                 </div>
             </div>
+
+            {error && <p className='mt-4 text-sm text-red-500'>{error}</p>}
 
             <div className='mt-6 flex items-center gap-3 text-xs text-gray-500'>
                 <CheckCircle size={16} className='mt-0.5' />
@@ -93,9 +122,11 @@ function page() {
             <motion.button
                 whileHover={{scale: 1.02}}
                 whileTap={{scale: 0.97}}
-                className='mt-8 w-full h-14 rounded-2xl bg-black text-white font-semibold disabled:opacity-40 transition cursor-pointer'
+                onClick={handleBank}
+                disabled={loading}
+                className='mt-8 w-full h-14 rounded-2xl bg-black text-white font-semibold disabled:opacity-40 transition cursor-pointer flex items-center justify-center'
             >
-                Continue
+                {loading? <CircleDashed className='text-white animate-spin' /> : "Continue"}
             </motion.button>
         </motion.div>
         </div>

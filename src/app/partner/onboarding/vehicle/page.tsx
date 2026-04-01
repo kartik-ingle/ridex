@@ -1,8 +1,9 @@
 'use client'
 import React, { useState } from 'react'
 import {motion} from "motion/react"
-import { ArrowLeft, Bike, Car, Package, Truck } from 'lucide-react'
+import { ArrowLeft, Bike, Car, CircleDashed, Package, Truck } from 'lucide-react'
 import { useRouter } from 'next/navigation'
+import axios from 'axios'
 
 const VEHICLES = [
   {id: "bike", label: "Bike", icon: Bike, desc: "2 wheeler"}, 
@@ -19,6 +20,28 @@ function page() {
   const [vehicleNumber, setVehicleNumber] = useState("")
 
   const [vehicleModel, setVehicleModel] = useState("")
+
+  const [error, setError] = useState("")
+
+  const [loading, setLoading] = useState(false)
+
+  const handleVehicle = async () => {
+    try {
+      setLoading(true)
+      const {data} = await axios.post("/api/partner/onboarding/vehicle", {
+        type: vehicleType, number: vehicleNumber, vehicleModel
+      })
+
+      setLoading(false)
+
+      setError("")
+
+      console.log(data)
+    } catch (error: any) {
+      setError(error?.response?.data?.message ?? "something went wrong")
+      setLoading(false)
+    }
+  }
   return (
     <div className='min-h-screen bg-white flex items-center justify-center px-4'>
       <motion.div
@@ -92,7 +115,7 @@ function page() {
               id='vn' 
               className='mt-2 w-full border-b border-gray-300 pb-2 text-sm focus:outline-none focus:border-black transition'
               value={vehicleNumber}
-              onChange={(e) => setVehicleNumber(e.target.value)}
+              onChange={(e) => setVehicleNumber(e.target.value.toUpperCase())}
             />
           </div>
 
@@ -109,12 +132,18 @@ function page() {
           </div>
         </div>
 
+        {error && (
+          <p className='text-red-500 mt-4'>*{error}</p>
+        )}
+
         <motion.button
           whileHover={{scale: 1.02}}
+          disabled={loading}
           whileTap={{scale: 0.97}}
           className='mt-8 w-full h-14 rounded-2xl bg-black text-white font-semibold flex items-center justify-center gap-2 disabled:opacity-40 transition cursor-pointer'
+          onClick={handleVehicle}
         >
-          Continue
+          {loading ? <CircleDashed className='text-white animate-spin' /> : "Continue"}
         </motion.button>
 
       </motion.div>
