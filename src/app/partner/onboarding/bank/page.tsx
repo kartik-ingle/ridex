@@ -5,6 +5,8 @@ import { ArrowLeft, BadgeCheck, CheckCircle, CircleDashed, CreditCard, Landmark,
 import { useRouter } from 'next/navigation'
 import axios from 'axios'
 
+const IFSC_REGEX = /^[A-Z]{4}0[A-Z0-9]{6}$/
+
 function page() {
     const router = useRouter()
 
@@ -17,13 +19,21 @@ function page() {
     const [loading, setLoading] = useState(false)
     const [error, setError] = useState("")
 
+    const sanitizedIfsc = ifsc.trim().toUpperCase()
+    const isNameValid = accountHolder.trim().length >= 3
+    const isAccountValid = accountNumber.trim().length >= 9
+    const isIfscValid = IFSC_REGEX.test(sanitizedIfsc)
+    const isMobileValid = mobileNumber.trim().length === 10
+
+    const canSubmit = isNameValid && isAccountValid && isIfscValid && isMobileValid
+
     const handleBank = async () => {
         setLoading(true)
         setError("")
 
         try {
             const {data} = await axios.post("/api/partner/onboarding/bank", {
-                accountHolder, accountNumber, ifsc, upi, mobileNumber
+                accountHolder, accountNumber, ifsc: sanitizedIfsc, upi, mobileNumber
             }) 
             console.log(data)
             setLoading(false)
@@ -70,8 +80,10 @@ function page() {
                         <div className='text-gray-400'>
                             <BadgeCheck />
                         </div>
-                        <input type="text" id='ahn' placeholder='As per bank records' value={accountHolder} onChange={(e) => setAccountHolder(e.target.value)} className='flex-1 border-b pb-2 text-sm focus:outline-none border-gray-300 focus:border-black'/>
+                        <input type="text" id='ahn' placeholder='As per bank records' value={accountHolder} onChange={(e) => setAccountHolder(e.target.value)} className={`flex-1 border-b pb-2 text-sm focus:outline-none ${isNameValid || accountHolder.length <= 0 ? "border-gray-300 focus:border-black" : "border-red-400 focus:border-red-500"}`}/>
                     </div>
+
+                    {!isNameValid && accountHolder.length > 0 && <p className='mt-1 text-xs text-red-500'>Minimum 3 characters required</p>}
                 </div>
 
                 <div>
@@ -80,8 +92,10 @@ function page() {
                         <div className='text-gray-400'>
                             <CreditCard />
                         </div>
-                        <input type="text" id='ban' placeholder='Enter account number' value={accountNumber} onChange={(e) => setAccountNumber(e.target.value)} className='flex-1 border-b pb-2 text-sm focus:outline-none border-gray-300 focus:border-black'/>
+                        <input type="text" id='ban' placeholder='Enter account number' value={accountNumber} onChange={(e) => setAccountNumber(e.target.value)} className={`flex-1 border-b pb-2 text-sm focus:outline-none ${isAccountValid || accountNumber.length <= 0 ? "border-gray-300 focus:border-black" : "border-red-400 focus:border-red-500"}`}/>
                     </div>
+
+                    {!isAccountValid && accountNumber.length > 0 && <p className='mt-1 text-xs text-red-500'>Minimum 9 characters required</p>}
                 </div>
 
                 <div>
@@ -90,8 +104,10 @@ function page() {
                         <div className='text-gray-400'>
                             <Landmark />
                         </div>
-                        <input type="text" id='ifsc' placeholder='HDFC0001234' value={ifsc} onChange={(e) => setIfsc(e.target.value)} className='flex-1 border-b pb-2 text-sm focus:outline-none border-gray-300 focus:border-black'/>
+                        <input type="text" id='ifsc' placeholder='HDFC0001234' value={ifsc} onChange={(e) => setIfsc(e.target.value.toUpperCase())} className={`flex-1 border-b pb-2 text-sm focus:outline-none ${isIfscValid || ifsc.length <= 0 ? "border-gray-300 focus:border-black" : "border-red-400 focus:border-red-500"}`}/>
                     </div>
+
+                    {!isIfscValid && ifsc.length > 0 && <p className='mt-1 text-xs text-red-500'>Invalid IFSC code</p>}
                 </div>
 
                 <div>
@@ -100,8 +116,11 @@ function page() {
                         <div className='text-gray-400'>
                             <Phone />
                         </div>
-                        <input type="tel" id='mob' placeholder='10 digit mobile number' value={mobileNumber} onChange={(e) => setMobileNumber(e.target.value)} className='flex-1 border-b pb-2 text-sm focus:outline-none border-gray-300 focus:border-black'/>
+                        <input type="tel" id='mob' placeholder='10 digit mobile number' value={mobileNumber} onChange={(e) => setMobileNumber(e.target.value)} className={`flex-1 border-b pb-2 text-sm focus:outline-none ${isMobileValid || mobileNumber.length <= 0 ? "border-gray-300 focus:border-black" : "border-red-400 focus:border-red-500"}`}/>
                     </div>
+
+                    {!isMobileValid && mobileNumber.length > 0 && <p className='mt-1 text-xs text-red-500'>Enter a valid 10-digit mobile number</p>}
+
                 </div>
 
                 <div>
@@ -123,7 +142,7 @@ function page() {
                 whileHover={{scale: 1.02}}
                 whileTap={{scale: 0.97}}
                 onClick={handleBank}
-                disabled={loading}
+                disabled={!canSubmit || loading}
                 className='mt-8 w-full h-14 rounded-2xl bg-black text-white font-semibold disabled:opacity-40 transition cursor-pointer flex items-center justify-center'
             >
                 {loading? <CircleDashed className='text-white animate-spin' /> : "Continue"}
