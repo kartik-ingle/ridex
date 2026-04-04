@@ -6,7 +6,7 @@ function Footer() {
   return (
     <div className='w-full bg-black text-white'>
       <motion.div
-        initial = {{opacity: 0, y: 40}}
+        initial = {false}
         whileInView={{opacity: 1, y:0}}
         transition = {{duration: 0.6, ease: "easeOut"}}
         viewport={{once: true}}

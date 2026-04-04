@@ -42,7 +42,7 @@ export async function POST(req: NextRequest) {
 
         await user.save()
 
-        return Response.json(partnerbank, {status: 200})
+        return Response.json({partnerbank, mobileNumber: user.mobileNumber}, {status: 200})
     } catch (error) {
         return Response.json({message: "internal server error"}, {status: 500})
     }
@@ -65,8 +65,8 @@ export async function GET(req: NextRequest) {
         const partnerbank = await partnerBank.findOne({owner: user._id})
 
         if(partnerbank) {
-            return Response.json(partnerbank, {status: 200})
-        } else return null
+            return Response.json({partnerbank, mobileNumber: user.mobileNumber}, {status: 200})
+        } else return Response.json({message: "bank details not found"}, {status: 404})
     } catch (error) {
         return Response.json({message: "internal server error"}, {status: 500})
     }

@@ -1,5 +1,5 @@
 'use client'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import {motion} from "motion/react"
 import { ArrowLeft, BadgeCheck, CheckCircle, CircleDashed, CreditCard, Landmark, Phone } from 'lucide-react'
 import { useRouter } from 'next/navigation'
@@ -43,6 +43,25 @@ function page() {
             setLoading(false)
         }
     }
+
+    useEffect(() => {
+        const handleGetBank = async () => {
+
+            try {
+                const {data} = await axios.get("/api/partner/onboarding/bank")
+                console.log(data)
+                setAccountHolder(data?.partnerbank?.accountHolder || "")
+                setAccountNumber(data?.partnerbank?.accountNumber || "")
+                setIfsc(data?.partnerbank?.ifsc || "")
+                setUpi(data?.partnerbank?.upi || "")
+                setMobileNumber(data?.mobileNumber)
+
+            } catch (error: any) {
+                console.log(error)
+            }
+        }
+        handleGetBank()
+    }, [])
 
     return (
         <div className='min-h-screen bg-white flex items-center justify-center px-4'>
