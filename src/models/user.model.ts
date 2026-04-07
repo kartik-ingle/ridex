@@ -11,7 +11,8 @@ export interface IUser extends Document {
     otpExpiresAt?: Date;
     partnerOnBoardingSteps: number
     mobileNumber?: string
-    partnerStatus?: "pending" | "approved" | "rejected"
+    partnerStatus?: "pending" | "approved" | "rejected",
+    rejectionReason?: string
     createdAt: Date;
     updatedAt: Date;
     comparePassword(candidate: string): Promise<boolean>;
@@ -52,6 +53,9 @@ const userSchema = new mongoose.Schema<IUser>({
         type: String,
         enum: ["pending", "approved", "rejected"],
         default: "pending"
+    },
+    rejectionReason: {
+        type: String
     },
     otp: {
         type: String

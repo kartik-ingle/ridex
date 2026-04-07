@@ -42,6 +42,11 @@ export async function POST(req: NextRequest) {
             vehicle.vehicleModel = vehicleModel
             vehicle.status = "pending"
             await vehicle.save()
+            if(user.partnerOnBoardingSteps < 2) {
+                user.partnerOnBoardingSteps = 2
+            } else user.partnerOnBoardingSteps = 3
+            user.partnerStatus = "pending"
+            await user.save()
             return Response.json({message: "vehicle details updated successfully"}, {status: 200})
         }
 
@@ -62,6 +67,7 @@ export async function POST(req: NextRequest) {
         }
 
         user.role = "partner"
+        user.partnerStatus = "pending"
         await user.save()
 
         return Response.json({vehicle}, {status: 201})
