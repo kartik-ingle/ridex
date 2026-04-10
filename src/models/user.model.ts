@@ -1,6 +1,8 @@
 import bcrypt from "bcryptjs";
 import mongoose, { Document } from "mongoose";
 
+type VideoKycStatus = "not_required" | "pending" | "in_progress" | "approved" | "rejected"
+
 export interface IUser extends Document {
     name: string;
     email: string;
@@ -13,6 +15,9 @@ export interface IUser extends Document {
     mobileNumber?: string
     partnerStatus?: "pending" | "approved" | "rejected",
     rejectionReason?: string
+    videoKycStatus: VideoKycStatus
+    videoKycRoomId: string
+    videoKycRejectionReason?: string   
     createdAt: Date;
     updatedAt: Date;
     comparePassword(candidate: string): Promise<boolean>;
@@ -55,6 +60,17 @@ const userSchema = new mongoose.Schema<IUser>({
         default: "pending"
     },
     rejectionReason: {
+        type: String
+    },
+    videoKycStatus: {
+        type: String,
+        enum: ["not_required", "pending", "in_progress", "approved", "rejected"],
+        default: "not_required"
+    },
+    videoKycRoomId: {
+        type: String
+    },
+    videoKycRejectionReason: {
         type: String
     },
     otp: {

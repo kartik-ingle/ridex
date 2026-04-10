@@ -37,8 +37,18 @@ function AdminDashboard() {
     }
   }
 
+  const handleGetPendingKyc = async () => {
+    try {
+      const {data} = await axios.get("/api/admin/video-kyc/pending")
+      setPendingKyc(data)
+    } catch (error) {
+      console.error(error)
+    }
+  }
+
   useEffect(() => {
     handleGetData()
+    handleGetPendingKyc()
   }, [])
   return (
     <div className='min-h-screen bg-gradient-to-br from-gray-100 to-gray-200'>
