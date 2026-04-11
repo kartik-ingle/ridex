@@ -44,8 +44,8 @@ function ContentList({data, type}: any) {
         </div>
 
         {data.map((item: any, index: number) => {
-            const name = item.name
-            const email = item.email
+            const name = item.name || item.owner.name
+            const email = item.email || item.owner.email
 
             return (
                 <motion.div
@@ -57,7 +57,7 @@ function ContentList({data, type}: any) {
                     className='bg-white border border-gray-100 rounded-2xl px-5 py-4 flex items-center justify-between gap-4 shadow-sm transition-shadow'
                 >
                     <div className='flex items-center gap-3 min-w-0'>
-                        <div className='w-10 h-10 rounded-xl flex items-center justify-center text-sm font-bold shrink-0 bg-purple-100 text-purple-800'>{name.charAt(0).toUpperCase() ?? <User size={14} />}</div>
+                        <div className='w-10 h-10 rounded-xl flex items-center justify-center text-sm font-bold shrink-0 bg-purple-100 text-purple-800'>{name?.charAt(0)?.toUpperCase() || <User size={14} />}</div>
 
                         <div className='min-w-0'>
                             <p className='font-bold text-sm text-gray-900 truncate'>{name}</p>

@@ -38,7 +38,12 @@ export async function GET(req: NextRequest) {
             vehicleType: vehicleTypeMap.get(p._id.toString())
         }))
 
+        const pendingVehicles = await Vehicle.find({
+            status: "pending"
+        }).populate("owner")
+
         return NextResponse.json({
+            pendingVehicles: pendingVehicles,
             stats: {
                 totalPartners,
                 totalApprovedPartners,
