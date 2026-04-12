@@ -3,7 +3,7 @@ import { RootState } from '@/redux/store'
 import React, { useEffect, useState } from 'react'
 import { useSelector } from 'react-redux'
 import {motion} from "motion/react"
-import { Check, Clock, Lock, Video } from 'lucide-react'
+import { ArrowRight, Check, Clock, Lock, Rocket, Video } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import RejectionCard from './RejectionCard'
 import StatusCard from './StatusCard'
@@ -222,6 +222,23 @@ function PartnerDashboard() {
             actionLabel = "Edit & Resubmit"
             onAction={() => setShowPricing(true)}
           />
+        )}
+
+        {activeStep == 8 && vehicleData?.status == "approved" && (
+          <motion.div
+            initial = {{opacity: 0, y: 30}}
+            animate = {{opacity: 1, y: 0}}
+            className='bg-black text-white rounded-3xl p-10 shadow-2xl'
+          >
+            <h2 className='flex gap-1 items-center text-2xl font-bold'>
+              <Rocket size={25} className='text-red-700' />
+              Congratulations! Your account is now live. You can start accepting rides.
+            </h2>
+
+            <button className='mt-6 bg-white text-black px-6 py-3 rounded-xl font-semibold flex items-center gap-2 cursor-pointer'>
+              Go to Bookings <ArrowRight size={16} />
+            </button>
+          </motion.div>
         )}
       </div>
 
