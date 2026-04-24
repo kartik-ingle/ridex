@@ -37,6 +37,7 @@ function page() {
         formdata,
       );
       setLoading(false);
+      router.push("/")
     } catch (error: any) {
       setError(error?.response?.data?.message || "something went wrong");
       console.log(error);

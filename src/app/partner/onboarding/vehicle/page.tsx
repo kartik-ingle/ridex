@@ -35,6 +35,7 @@ function page() {
       setLoading(false)
 
       setError("")
+      router.push("/")
 
       console.log(data)
     } catch (error: any) {
