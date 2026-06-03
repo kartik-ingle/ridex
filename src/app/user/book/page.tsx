@@ -63,8 +63,8 @@ function page() {
         state: f.properties.state,
         country: f.properties.country,
         countrycode: f.properties.countrycode,
-        lat: f.geometry.coordinates[0],
-        lon: f.geometry.coordinates[1]
+        lat: f.geometry.coordinates[1],
+        lon: f.geometry.coordinates[0]
 
       }))
       if(restrict) {
@@ -80,7 +80,10 @@ function page() {
   const suggestion = (p:Place) => [p.name, p.city, p.state, p.country].filter(Boolean).join(", ")
 
   const useCurrentLocation = () => {
-    if(!navigator.geolocation) return;
+    if (!navigator.geolocation) {
+      console.log("Geolocation not supported");
+      return;
+    }
     setLocating(true)
     navigator.geolocation.getCurrentPosition(async ({coords}) => {
       try {
@@ -413,7 +416,7 @@ function page() {
                   whileHover={canContinue ? {scale: 1.02} : {}}
                   disabled={!canContinue}
                   onClick={() => {
-                    router.push(`/search?pickup=${encodeURIComponent(pickUp)}&drop=${encodeURIComponent(drop)}&vehicle=${vehicle}&mobile=${encodeURIComponent(mobile)}&pickuplat=${pickUpLat}&pickuplon=${pickUpLon}&droplat=${dropLat}&droplon=${dropLon}`)
+                    router.push(`/user/search?pickup=${encodeURIComponent(pickUp)}&drop=${encodeURIComponent(drop)}&vehicle=${vehicle}&mobile=${encodeURIComponent(mobile)}&pickuplat=${pickUpLat}&pickuplon=${pickUpLon}&droplat=${dropLat}&droplon=${dropLon}`)
                   }}
                   className='w-full h-14 rounded-2xl bg-zinc-900 hover:bg-black disabled:opacity-35 text-white font-black text-sm tracking-wide flex items-center justify-center gap-2.5 transition-colors shadow-lg disabled:shadow-none cursor-pointer'
                 >
